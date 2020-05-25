@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    
+    <link rel="stylesheet" type="text/css" href="css/tooltip.css">    
+    
+    <script src="js/utils.js"></script>
+    
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js"></script>
+
+    <style>
+        path {
+            fill: #FFFFFF;
+            stroke: black;
+        }
+        body {
+            font-family: Rockwell;
+        }
+        #map {
+            border: "1px solid #ddd";
+            padding: 10px;
+            float: left;
+        }
+        #timelineDiv {
+            float: right;
+            height: 500px;
+            overflow-y: auto;
+        }
+        #eventTimeline {
+            font-size: 11px;
+        }
+        .details {
+            color: white;
+        }
+        #play {
+            position: absolute;
+            top: 650px;
+            left: 50%;
+            right: 50%;
+            background: #f08080;
+            padding-right: 26px;
+            border-radius: 3px;
+            border: none;
+            color: white;
+            margin: 0;
+            padding: 0 12px;
+            width: 60px;
+            cursor: pointer;
+            height: 30px;
+        }
+        #play:hover {
+            background-color: #696969;
+            cursor: pointer;
+        }
+        #thedate {
+            position: absolute;
+            top: 590px;
+        }
+        .eventCircle:hover {
+            cursor: pointer;
+        }
+        
+    </style>
+    
+    <script>
+        var mapFile = "data/geojson/world-50m.geo.json";
+        var dataFile = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+        
+        var basemapData;
+        var projection = d3.geoMercator()
+            .center([-78.4767,38.0293])
+            .rotate([0,0]);
+        var path = d3.geoPath().projection(projection);
+
+        var data;
+        var country_code;
+        var timeline_events;
+        
+        var parseDate = d3.timeParse("%m/%d/%y");
+        var startDate = new Date("1/22/20");
+        var endDate = yesterdayDate();
+        var curr_date = getDateAsString(endDate);
+        var date = curr_date;
+        var dateScale = d3.scaleTime().domain([new Date("12/31/19"), endDate]).range([20,12500]);
+        
+        var playing = false;
+        
+        var colorScale = d3.scaleThreshold()
+            .domain([-1, 1, 500, 1000, 5000, 10000, 50000, 100000, 500000, 700000])
+            .range(["#ffffff", "#ffffff", "#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#a50f15", "#67000d"]);
+        
+        var timelineColors = {"spread": "#F08080", "response": "#A6D785"}
+        
+        function draw() {
+            var svg = d3.select("#map");
+            drawBaseMap(svg);
+            loadData();
+            drawLegend(svg);
+            setTimeout(function(){
+                colorize(date);
+                drawToolTip(svg);
+                drawTimeline();
+            },250);
+            configurePlayButton();
+            
+        };
+        
+        function drawBaseMap(svg) {
+            d3.json(mapFile).then(function(geojson) {
+                basemapData = geojson;
+                var basemap = svg.append("g").attr("id","basemap");
+                basemap.selectAll("path")
+                    .data(geojson.features)
+                    .enter()
+                        .append("path")
+                        .attr("d", path)
+                        .attr("id", function(d) {return d.properties.iso_a3});
+            });
+        };
+        
+        function loadData() {
+            d3.json("data/geojson/country_code.json").then(function(d){
+                country_code = d;
+            });
+            
+            d3.csv("data/timeline_events.csv").then(function(d){
+                timeline_events = d;
+            });
+            
+            d3.csv(dataFile).then(function(d){
+                data = d;
+            });  
+        };
+        
+        function colorize(date) {
+//            console.log(date);
+            confirmedCasesPerCountry = {};
+            data.forEach(function(d){
+                var country = d["Country/Region"];
+                var confirmedCases = +d[date];
+                if(confirmedCasesPerCountry.hasOwnProperty(country) === false) {
+                    confirmedCasesPerCountry[country] = +d[date];
+                } else {
+                    confirmedCasesPerCountry[country] = confirmedCasesPerCountry[country] + (+d[date]);
+                }
+            });
+            confirmedCasesPerCountryD3 = d3.entries(confirmedCasesPerCountry);
+            confirmedCasesPerCountryD3.forEach(function(d){
+                var country = d.key;
+                var confirmedCases = d.value;
+                d3.selectAll("#"+country_code[country])
+                    .style("fill", colorScale(confirmedCases))
+                    .style('stroke', '#191919')
+                    .style('opacity', 0.8)
+                    .style('stroke-width', 0.5);
+            })
+            d3.select(".caption").text("Confirmed Cases on Date : "+date);
+        };
+        
+        function drawLegend(svg) {
+            // Legend
+            var g = svg.append("g")
+                .attr("class", "legendThreshold")
+                .attr("transform", "translate(20,20)")
+                .style("font-size", "10px");
+            g.append("text")
+                .attr("class", "caption")
+                .attr("x", 0)
+                .attr("y", -6)
+                .text("Confirmed Cases on Date : "+date)
+                .style("font-size", "14px");
+            
+            var labels = ['', '0', '1 - 500', '500 - 1000', '1000 - 5000', '5000 - 10000', '10000 - 50000', '50000 - 100000', '100000 - 500000', '500000 - 700000', '> 700000'];
+            
+            var legend = d3.legendColor()
+                .labels(function (d) { return labels[d.i]; })
+                .shapePadding(4)
+                .scale(colorScale);
+            
+            svg.select(".legendThreshold")
+                .call(legend);
+        };
+        
+        function drawToolTip(svg) {
+            var tip = d3.tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .direction(function(d){
+                    code = d.properties.iso_a3
+                    if(code == 'USA') {
+                        return 'w';
+                    }
+                    if(code == 'RUS' || code == 'NZL') {
+                        return 'e';
+                    }
+                    return 's';
+                })
+                .html(function(d) {
+                    var code = d.properties.iso_a3
+                    var country = getKeyByValue(country_code, code)
+                    var confirmedCases = 0;
+                    console.log(data);
+                    data.forEach(function(d){
+                        if(d["Country/Region"] == country) {
+                            console.log(+d[date]);
+                            confirmedCases = confirmedCases + (+d[date]);
+                        }
+                    });
+                console.log('Date: ' + date);
+                console.log(confirmedCases);
+//                confirmedCases = numberWithCommas(confirmedCases)
+                return `<strong>Country: </strong><span class='details'>${country}<br></span><strong>Confirmed Cases: </strong><span class='details'>${confirmedCases}</span>`;
+                });
+            
+            svg.call(tip);
+            data.forEach(function(d){
+                var country = d["Country/Region"];
+                d3.selectAll("#"+country_code[country])
+                    .on("mouseover", function(d){
+                        console.log(d);
+                        tip.show(d);
+                        d3.select(this)
+                          .style('opacity', 1)
+                          .style('stroke-width', 1.5);
+                    
+                    })
+                    .on("mouseout", function(d){
+                        tip.hide(d);
+                        d3.select(this)
+                          .style('opacity', 0.8)
+                          .style('stroke-width',0.5);
+                    });
+            });
+        };
+        
+        function configurePlayButton() {
+            var playButton = d3.select('#play')
+            playButton.on('click', function() {  // when user clicks the play button
+                console.log(playing);
+                if(playing == false) {
+                    dt = new Date("1/22/20");
+                    playing = true;
+                    date = getDateAsString(dt);
+                    clearInterval(timer);
+                    var timer = setInterval(function(d){
+                        console.log("**")
+                        date = getDateAsString(dt);
+                        d3.select(".caption").text("Confirmed Cases on Date : "+date);
+                        colorize(date);
+                        if(date === curr_date) { //curr_date is yesterday's date
+                            playing = false;
+                            clearInterval(timer);
+                        }
+                        dt.setDate(dt.getDate()+1);
+                    }, 150);
+                    //old number 200
+                } else {
+                    playing = false;
+                }
+            });
+        };
+        
+        function drawTimeline() {
+            var svg_tl = d3.select("#eventTimeline");
+            var startY = 20;
+            
+            allDates = getAllDates(startDate, endDate);
+            timelineDates = []
+            timeline_events.forEach(function(d){
+                timelineDates.push(d["event_date"])
+            });
+            nonTimelineDates = d3.entries(allDates.filter(x => !timelineDates.includes(x)));
+            
+            svg_tl.append("line")
+                .attr("x1", "6")
+                .attr("y1", "0")
+                .attr("x2", "6")
+                .attr("y2", svg_tl.attr("height"))
+                .style("stroke", "black");
+            
+            svg_tl.selectAll("text").data(timeline_events).enter().append("text")
+                .attr("x", "20")
+                .attr("y", function(d){
+                    y = +d["event_num"];
+                    return startY + dateScale(new Date(d["event_date"]));
+                })
+                .text(function(d){
+                    return d["event_date"] + " : " + d["event"]
+                })
+                .call(wrap, 275);
+            
+            svg_tl.selectAll("event.circle").data(timeline_events).enter().append("circle")
+                .attr("cx", "6")
+                .attr("cy", function(d){
+                    y = +d["event_num"];
+                    return startY + dateScale(new Date(d["event_date"]));
+                })
+                .attr("r", "5")
+                .attr("class", "eventCircle")
+                .attr("id", function(d){
+                    return d["event_date"];
+                })
+                .style("fill", function(d){
+                    return timelineColors[d["type"]];
+                })
+                .style("stroke", "black")
+                .style("stroke-width", "1.5px")
+                .on("click", function(){
+                    date = d3.select(this).attr("id");
+                    colorize(date);
+                });
+            
+            svg_tl.selectAll("nonevent.circle").data(nonTimelineDates).enter().append("circle")
+                .attr("cx", "6")
+                .attr("cy", function(d){
+                    console.log(d.value);
+                    return startY + dateScale(new Date(d.value));
+                })
+                .attr("r", "3")
+                .attr("class", "eventCircle")
+                .attr("id", function(d){
+                    return d.value;
+                })
+                .style("fill", "black")
+                .style("stroke", "black")
+                .style("stroke-width", "1.5px")
+                .on("click", function(){
+                    date = d3.select(this).attr("id");
+                    colorize(date);
+                });
+        };
+
+    </script>
+</head>
+
+<body onload="draw()" height="650">
+    <center><h3>Progression of COVID-19 and the World's Response</h3></center>
+    <br/>
+    <div width="78%">
+        <svg id="map" width="78%" height="630"></svg>
+    </div>
+    <div width="20%">
+        <center>
+            <h5 style="text-align: center">
+                The <span style="color:#F08080">Spread</span> and <span style="color:#A6D785">Response</span> Timeline
+            </h5>
+            <img src="496855-200.png" alt="scroll_down" style="display: inline-block; height: 25px; float: right; position: absolute; padding-left: 5px; top: 95px; left: 1485px">
+        </center>
+    </div>
+    <div id="timelineDiv" width="20%"  height="630">
+        <svg id="eventTimeline" width="100%" height="12600"></svg>
+    </div>
+    <button id="play">Play</button>
+    <div style="float: none">
+        <center>
+            <h5 style="text-align: center; position: absolute; top: 680px; left: 37%">
+                Use the Play button to view the Progression of COVID-19 with Time
+            </h5>
+        </center>
+        
+    </div>
+</body>

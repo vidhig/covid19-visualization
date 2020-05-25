@@ -1,0 +1,40 @@
+event_num,event_date,event,type
+0,12/31/19,Pneumonia of unknown cause reported to WHO China Office. No Data has been collected at this point. Data is available from Jan 22nd. [Continue scrolling to view the timeline],spread
+1,1/23/20,WHO Director General Dr Tedros Adhanom Ghebreyesus convened the Emergency Committee to consider the outbreak of the novel coronavirus in China. By this time the novel coronavirus has already entered the United States.,response
+2,1/26/20,"The novel coronavirus reaches Australia and Canada.",spread
+3,1/30/20,"WHO Director-General declared the 2019-nCoV outbreak a Public Health Emergency of International Concern, following a second meeting of the Emergency Committee convened under the International Health Regulations.",response
+4,1/31/20,"The novel coronavirus reaches India, Italy and Russia.",spread
+5,2/11/20,Novel coronavirus disease named COVID-19.,response
+6,2/12/20,"WHO activates a Crisis Management Team that will be managed by the Executive Director of WHO Health Emergencies Programme, Dr Mike Ryan. It will help WHO focus on the health response while the other agencies will bring their expertise to bear on the wider social, economic and developmental implications of the outbreak.",response
+7,2/14/20,"COVID-19 reaches Africa, first case reported in Egypt.",spread
+8,2/19/20,COVID-19 reaches Iran,spread
+9,2/21/20,"WHO Director-General tweets 'Countries with weaker health systems need the world's focus & support now, due to the potential for #COVID19 to spread to those locations. We must take advantage of the window of opportunity we have to contain the outbreak. We don't want to look back later & regret failing to act.'.",response
+10,2/24/20,"A team of experts from WHO and the European Centre for Disease Prevention and Control (ECDC) will focus on: understanding how events developed, learning from the Italian experience and supporting control and prevention efforts by the authorities.",response
+11,2/26/20,"COVID-19 reaches South America, first case reported in Brazil.",spread
+12,2/27/20,"Italy crosses 500 active COVID-19 cases.",spread
+13,2/29/20,Iran jumps to 593 cases from 388 within 24 hours.,spread
+14,3/2/20,"A team of WHO experts reach Iran and aim to identify transmission dynamics and at-risk populations, as well as provide guidance on strengthening and scaling up the response and readiness efforts.",response
+15,3/6/20,"The number of confirmed cases all over the world crosses the 100k mark. WHO publishes the R&D roadmap for COVID-19 outlines research priorities in 9 key areas. These include the natural history of the virus, epidemiology, diagnostics, clinical management, ethical considerations and social sciences, as well as longer-term goals for therapeutics and vaccines.",response
+16,3/8/20,USA crosses 500 active COVID-19 cases.,spread
+17,3/9/20,"Lockdown initiated in Italy to stop the spread of COVID-19.",response
+18,3/11/20,WHO characterizes COVID-19 as a pandemic.,response
+19,3/13/20,Europe becomes epicenter of the pandemic.,spread
+20,3/16/20,"USA bans travel to and from 26 European countries and China.",response
+21,3/18/20,"Canada restricts entry to the country including citizens.",response
+22,3/19/20,"Italy's COVID-19 death toll surpasses China's.",spread
+23,3/17/20,"The WHO today called on Member states in South-East Asia Region to urgently scale-up aggressive measures to combat COVID-19, as confirmed cases cross 480, and the disease claims eight lives.",response
+24,3/20/20,"To increase access to reliable information, WHO worked with WhatsApp and Facebook to launch a new WHO Health Alert messaging service today. The WhatsApp-based service will provide vital information about COVID-19 to millions of people through their mobile phones.",response
+25,3/21/20,"Australia imposes social distancing and closes non-essential services.",response
+26,3/24/20,"India initiates lockdown to combat the spread of COVID-19",response
+27,3/25/20,"The UN issued a $2 billion appeal to fight coronavirus in the most vulnerable countries. Properly funded, it will provide laboratory materials for testing, supplies to protect health workers and medical equipment to treat the sick. It will bring water and sanitation to places facing shortages, and will help humanitarian workers and supplies get to where they are needed most to support the COVID-19 response.",response
+28,3/27/20,"Brazil announces a temporary ban on foreign air travelers and most state governors impose quarantines to prevent the spread of the virus.",response
+29,3/29/20,"USA passes 140,000 coronavirus cases: more than any other country in the world.",spread
+30,3/30/20,"Lockdown initiated in multiple towns of Russia.",response
+31,4/1/20,"WHO’s Regional Office for Africa hosted a virtual ‘hackathon’ bringing together 100 leading innovators to pioneer creative local solutions to the COVID-19 pandemic and to address critical gaps in the regional response. Proposals ranged from mobile-driven self-diagnosis, screening and mapping tools to alternative low-cost methods for producing personal protective equipment (PPE). The three highest ranking groups will now receive seed funding and WHO support to help develop and implement their solutions.",response
+32,4/9/20,COVID-19 response reaches the 100 day mark.,spread
+33,4/13/20,"Coordinated by WHO, scientists, physicians, funders and manufacturers have come together to help speed up the availability of a vaccine against COVID-19.",response
+34,4/14/20,"WHO cargo carrying vital COVID-19 medical supplies to all African nations.",response
+35,4/22/20,"Germany approves first trials for a coronavirus vaccine.",response
+36,4/25/20,"WHO reports that there is still no evidence that recovered patients are immune from the coronavirus.",spread
+37,4/28/20,"USA records over one million COVID-19 cases.",spread
+38,5/4/20,"Global pledging event raises over €7.4 billion for COVID-19 research and development",response
